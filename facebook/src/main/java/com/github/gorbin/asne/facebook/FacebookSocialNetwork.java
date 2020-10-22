@@ -27,8 +27,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -84,6 +85,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
     private com.github.gorbin.asne.core.AccessToken accessToken;
     private ShareDialog shareDialog;
     private String mPhotoPath;
+    private Bitmap mPhotoBitmap;
     private String mStatus;
     private Bundle mBundle;
     private List<String> permissions;
@@ -147,7 +149,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
 
 
     //TODO: refactor to use an init that is shared by constructors
-    public FacebookSocialNetwork(Fragment fragment, ArrayList<String> permissions) {
+    public FacebookSocialNetwork(Fragment fragment, List<String> permissions) {
         super(fragment);
         this.fragment = fragment;
         FacebookSdk.sdkInitialize(fragment.getActivity().getApplicationContext());
@@ -433,6 +435,16 @@ public class FacebookSocialNetwork extends SocialNetwork {
         postPhoto(mPhotoPath, message);
     }
 
+    @Override
+    public void requestPostPhoto(Bitmap bitmap, String message, OnPostingCompleteListener onPostingCompleteListener) {
+        super.requestPostPhoto(bitmap, message, onPostingCompleteListener);
+        mPhotoBitmap = bitmap;
+        mStatus = message;
+        requestID = REQUEST_POST_PHOTO;
+        performPublish(PendingAction.POST_PHOTO);
+        postPhoto(mPhotoBitmap, message);
+    }
+
     /**
      * Post link with message to social network
      * @param bundle bundle containing information that should be shared(Bundle constants in {@link com.github.gorbin.asne.core.SocialNetwork})
@@ -602,7 +614,11 @@ public class FacebookSocialNetwork extends SocialNetwork {
 
         switch (previouslyPendingAction) {
             case POST_PHOTO:
-                postPhoto(mPhotoPath, mStatus);
+                if (mPhotoPath != null) {
+                    postPhoto(mPhotoPath, mStatus);
+                } else {
+                    postPhoto(mPhotoBitmap, mStatus);
+                }
                 break;
             case POST_STATUS_UPDATE:
                 postStatusUpdate(mStatus);
@@ -647,8 +663,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
         }
     }
 
-    private void postPhoto(final String path, final String message) {
-        Bitmap image = BitmapFactory.decodeFile(path);
+    private void postPhoto(Bitmap image, String message) {
         SharePhoto photo = new SharePhoto.Builder()
                 .setBitmap(image)
                 .setCaption(message)
@@ -685,6 +700,11 @@ public class FacebookSocialNetwork extends SocialNetwork {
                         fragment.getActivity(), Collections.singletonList(PERMISSION)); //Arrays.asList("publish_actions"));
             }
         }
+    }
+
+    private void postPhoto(final String path, final String message) {
+        Bitmap image = BitmapFactory.decodeFile(path);
+        postPhoto(image, message);
     }
 
     private void postLink(final Bundle bundle) {

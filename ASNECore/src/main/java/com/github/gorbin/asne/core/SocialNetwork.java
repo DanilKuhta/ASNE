@@ -24,10 +24,12 @@ package com.github.gorbin.asne.core;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import com.github.gorbin.asne.core.listener.OnCheckIsFriendCompleteListener;
 import com.github.gorbin.asne.core.listener.OnRequestAccessTokenCompleteListener;
@@ -365,6 +367,15 @@ public abstract class SocialNetwork {
 
     /**
      * Post photo to social network using global listener
+     * @param bitmap photo that should be shared
+     * @param message message that should be shared with photo
+     */
+    public void requestPostPhoto(Bitmap bitmap, String message) {
+        requestPostPhoto(bitmap, message, null);
+    }
+
+    /**
+     * Post photo to social network using global listener
      * @param photo photo that should be shared
      * @param message message that should be shared with photo
      */
@@ -379,6 +390,10 @@ public abstract class SocialNetwork {
      * @param onPostingCompleteListener listener for posting request
      */
     public void requestPostPhoto(File photo, String message, OnPostingCompleteListener onPostingCompleteListener) {
+        registerListener(REQUEST_POST_PHOTO, onPostingCompleteListener);
+    }
+
+    public void requestPostPhoto(Bitmap bitmap, String message, OnPostingCompleteListener onPostingCompleteListener) {
         registerListener(REQUEST_POST_PHOTO, onPostingCompleteListener);
     }
 

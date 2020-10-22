@@ -11,6 +11,7 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            tools:replace="android:theme"
             />
     </application>
 </manifest>
