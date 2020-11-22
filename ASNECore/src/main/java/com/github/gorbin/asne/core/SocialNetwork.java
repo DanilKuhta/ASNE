@@ -114,7 +114,7 @@ public abstract class SocialNetwork {
 
     /*** Shared preferences name */
     private static final String SHARED_PREFERENCES_NAME = "social_networks";
-    protected Fragment mSocialNetworkManager;
+    protected ActivityProvider mSocialNetworkManager;
     protected SharedPreferences mSharedPreferences;
     protected Map<String, SocialNetworkListener> mGlobalListeners = new HashMap<String, SocialNetworkListener>();
     protected Map<String, SocialNetworkListener> mLocalListeners = new HashMap<String, SocialNetworkListener>();
@@ -124,7 +124,7 @@ public abstract class SocialNetwork {
      *                 we will want to receice on onActivityResult in out SocialNetworkManager
      *                 fragment
      */
-    protected SocialNetwork(Fragment fragment) {
+    protected SocialNetwork(ActivityProvider fragment) {
         mSocialNetworkManager = fragment;
         mSharedPreferences = mSocialNetworkManager.getActivity().getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
@@ -133,7 +133,7 @@ public abstract class SocialNetwork {
      * @param socialMediaManager the SocialMediaManager fragment.
      * @param context ant Activity or Application if not being called from a fragment
      */
-    protected SocialNetwork(Fragment socialMediaManager, Context context) {
+    protected SocialNetwork(ActivityProvider socialMediaManager, Context context) {
         //we keep the fragment in case it is needed in future. it also minimises the changes required.
         mSocialNetworkManager = socialMediaManager;
         mSharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);

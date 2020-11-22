@@ -42,7 +42,7 @@ public abstract class OAuthSocialNetwork extends SocialNetwork {
 
     protected Map<String, SocialNetworkAsyncTask> mRequests = new HashMap<String, SocialNetworkAsyncTask>();
 
-    protected OAuthSocialNetwork(Fragment fragment) {
+    protected OAuthSocialNetwork(ActivityProvider fragment) {
         super(fragment);
     }
 
