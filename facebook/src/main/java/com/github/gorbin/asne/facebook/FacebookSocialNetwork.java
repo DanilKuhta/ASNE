@@ -29,8 +29,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.fragment.app.Fragment;
-
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.GraphRequest;
@@ -40,10 +38,12 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.github.gorbin.asne.core.ActivityProvider;
 import com.github.gorbin.asne.core.SocialNetwork;
 import com.github.gorbin.asne.core.SocialNetworkException;
 import com.github.gorbin.asne.core.listener.OnCheckIsFriendCompleteListener;
@@ -80,7 +80,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
     public static final int ID = 4;
 
     private static final String PERMISSION = "publish_actions";
-    private Fragment fragment;
+    private ActivityProvider activityProvider;
     private CallbackManager callbackManager;
     private com.github.gorbin.asne.core.AccessToken accessToken;
     private ShareDialog shareDialog;
@@ -149,14 +149,14 @@ public class FacebookSocialNetwork extends SocialNetwork {
 
 
     //TODO: refactor to use an init that is shared by constructors
-    public FacebookSocialNetwork(Fragment fragment, List<String> permissions) {
-        super(fragment);
-        this.fragment = fragment;
-        FacebookSdk.sdkInitialize(fragment.getActivity().getApplicationContext());
+    public FacebookSocialNetwork(ActivityProvider activityProvider, List<String> permissions) {
+        super(activityProvider);
+        this.activityProvider = activityProvider;
+        FacebookSdk.sdkInitialize(activityProvider.getActivity().getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
-        shareDialog = new ShareDialog(fragment.getActivity());
+        shareDialog = new ShareDialog(activityProvider.getActivity());
         shareDialog.registerCallback(callbackManager, ShareCallBack);
-        String applicationID = Utility.getMetadataApplicationId(fragment.getActivity());
+        String applicationID = Utility.getMetadataApplicationId(activityProvider.getActivity());
 
         if (applicationID == null) {
             throw new IllegalStateException("applicationID can't be null\n" +
@@ -193,7 +193,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
     @Override
     public void requestLogin(OnLoginCompleteListener onLoginCompleteListener) {
         super.requestLogin(onLoginCompleteListener);
-        LoginManager.getInstance().logInWithReadPermissions(fragment.getActivity(), permissions);
+        LoginManager.getInstance().logInWithReadPermissions(activityProvider.getActivity(), permissions);
         LoginManager.getInstance().registerCallback(callbackManager, LoginCallback);
     }
 
@@ -658,7 +658,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
                 });
             } else {
                 LoginManager.getInstance().logInWithPublishPermissions(
-                        fragment.getActivity(), Collections.singletonList(PERMISSION));//Arrays.asList("publish_actions"));
+                        activityProvider.getActivity(), Collections.singletonList(PERMISSION));//Arrays.asList("publish_actions"));
             }
         }
     }
@@ -670,6 +670,8 @@ public class FacebookSocialNetwork extends SocialNetwork {
                 .build();
         SharePhotoContent content = new SharePhotoContent.Builder()
                 .addPhoto(photo)
+                .setShareHashtag(new ShareHashtag.Builder().setHashtag("LaWay").build())
+                .setContentUrl(Uri.parse("https://laway.app"))
                 .build();
 
         if (ShareDialog.canShow(SharePhotoContent.class)) {
@@ -697,7 +699,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
                 });
             } else {
                 LoginManager.getInstance().logInWithPublishPermissions(
-                        fragment.getActivity(), Collections.singletonList(PERMISSION)); //Arrays.asList("publish_actions"));
+                        activityProvider.getActivity(), Collections.singletonList(PERMISSION)); //Arrays.asList("publish_actions"));
             }
         }
     }
@@ -768,7 +770,7 @@ public class FacebookSocialNetwork extends SocialNetwork {
                 });
             } else {
                 LoginManager.getInstance().logInWithPublishPermissions(
-                        fragment.getActivity(), Collections.singletonList("publish_actions"));
+                        activityProvider.getActivity(), Collections.singletonList("publish_actions"));
             }
         }
 
